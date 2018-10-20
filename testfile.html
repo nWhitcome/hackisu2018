@@ -130,16 +130,19 @@
       // Also attach the marker to an array so we can keep track of it and remove it
       // when calculating new routes.
       var myRoute = directionResult.routes[0].overview_path;
+      console.log(directionResult.routes[0])
+      total_distance = 0;
       for (var i = 0; i < myRoute.length; i++) {
         var marker = markerArray[i] = markerArray[i] || new google.maps.Marker;
         marker.setMap(map);
         marker.setPosition(myRoute[i]);
         if(i > 0){
-          var temp_coord_array_1 = myRoute[1].toString().replace(/[^\d\s.-]/g, '').split(" ");
+          var temp_coord_array_1 = myRoute[i].toString().replace(/[^\d\s.-]/g, '').split(" ");
           var past_coord_array_1 = coord_previous.toString().replace(/[^\d\s.-]/g, '').split(" ");
           console.log(temp_coord_array_1, past_coord_array_1);
           var tempDist = calcCrow(temp_coord_array_1[0], temp_coord_array_1[1], past_coord_array_1[0], past_coord_array_1[1]);
-          console.log(tempDist);
+          total_distance = total_distance + tempDist;
+          console.log(total_distance);
         }
         coord_previous = myRoute[i];
         attachInstructionText(
@@ -158,7 +161,7 @@
 
     function calcCrow(lat1, lon1, lat2, lon2) 
     {
-      var R = 6371; // km
+      var R = 3963.1905919; // km
       var dLat = toRad(lat2-lat1);
       var dLon = toRad(lon2-lon1);
       var lat1 = toRad(lat1);

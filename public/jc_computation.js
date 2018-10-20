@@ -3,6 +3,7 @@ var input_target = 0.0;
 var map, infoWindow;
 var distance_string = "";
 var waypoints = [];
+var coord_previous;
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: 37.0902, lng: -95.7129 },
@@ -11,6 +12,8 @@ function initMap() {
     infoWindow = new google.maps.InfoWindow;
     var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     var labelIndex = 0;
+    var current_route = 0;
+    var number_of_responses = 0;
     var markerArray = [];
     var pos = {
         lat: 0,
@@ -20,7 +23,6 @@ function initMap() {
         lat: 42.0140,
         lng: -93.6358
     }
-
     // Try HTML5 geolocation.
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -53,6 +55,11 @@ function initMap() {
     var directionsDisplay = new google.maps.DirectionsRenderer;
     directionsDisplay.setMap(map);
 
+    var clearRouteNumber = function(){
+        var current_route = 0;
+        console.log(current_route);
+        onChangeHandler();
+    }
     var onChangeHandler = function () { //When The run button is clicked
         if (document.getElementById('north_radio').checked == true) {
             trice_pos = {
@@ -85,8 +92,20 @@ function initMap() {
         }
     };
 
-    document.getElementById('testbutton').addEventListener('click', onChangeHandler);
+    var getAlternate = function () {
+        console.log("here");
+        if (current_route < number_of_responses - 1) {
+            current_route = current_route + 1;
+        }
+        else {
+            current_route = 0;
+        }
+        document.getElementById('cur_alt_text').innerHTML = "Current path: " + current_route;
+        onChangeHandler();
+    }
 
+    document.getElementById('testbutton').addEventListener('click', clearRouteNumber);
+    document.getElementById('alternate_button').addEventListener('click', getAlternate);
     function calculateAndDisplayRoute(directionsService, directionsDisplay, display_bool, start, finish) {
         total_distance = 0;
         directionsService.route({
@@ -94,7 +113,8 @@ function initMap() {
             destination: finish,
             travelMode: 'WALKING',
             avoidTolls: true,
-            avoidHighways: true
+            avoidHighways: true,
+            provideRouteAlternatives: true
         }, function (response, status) {
             if (status === 'OK') {
                 if (display_bool == true) {
@@ -102,7 +122,6 @@ function initMap() {
                     if (document.getElementById('loop_radio').checked == true) {
                         temp_distance = parseFloat(distance_string.replace(/[^\d.-]/g, ''));
                         temp_distance = temp_distance * 2.0;
-                        console.log(temp_distance);
                         distance_string = temp_distance.toString().replace(/[^\d.-]/g, '');
                     }
                     document.getElementById('total_mile_counter').innerHTML = distance_string.replace(/[^\d.-]/g, '');
@@ -119,36 +138,38 @@ function initMap() {
         // For each step, place a marker, and add the text to the marker's infowindow.
         // Also attach the marker to an array so we can keep track of it and remove it
         // when calculating new routes.
-        var myRoute = directionResult.routes[0].legs[0];
-        for (var i = 0; i < myRoute.steps.length; i++) {
-            if ((parseFloat(total_distance) > parseFloat(input_target)) || (i == myRoute.steps.length - 1)) {
-                calculateAndDisplayRoute(directionsService, directionsDisplay, true, pos, myRoute.steps[i - 1].start_location);
-                console.log(myRoute.steps[i - 1].start_location)
+        var myRoute = directionResult.routes[current_route].overview_path;
+        number_of_responses = directionResult.routes.length;
+        document.getElementById('num_alt_text').innerHTML = "Number of alternates: " + (number_of_responses - 1);
+        console.log(directionResult.routes);
+        for (var i = 0; i < myRoute.length; i++) {
+            console.log(current_route);
+            if ((parseFloat(total_distance) > parseFloat(input_target)) || (i == myRoute.length - 1)) {
+                calculateAndDisplayRoute(directionsService, directionsDisplay, true, pos, myRoute[i - 1]);
                 break;
             }
             var marker = markerArray[i] || new google.maps.Marker;
             if (i > 0) {
-                var current_distance_array = myRoute.steps[i - 1].distance.text.split(" ");
-                var current_distance = current_distance_array[0];
-                if (current_distance_array[1] == "ft") {
-                    current_distance = current_distance / 5280.0;
-                }
-                total_distance = parseFloat(total_distance) + parseFloat(current_distance);
+                var temp_coord_array_1 = myRoute[i].toString().replace(/[^\d\s.-]/g, '').split(" ");
+                var past_coord_array_1 = coord_previous.toString().replace(/[^\d\s.-]/g, '').split(" ");
+                var tempDist = calcCrow(temp_coord_array_1[0], temp_coord_array_1[1], past_coord_array_1[0], past_coord_array_1[1]);
+                total_distance = total_distance + tempDist;
                 distance_string = total_distance.toString();
                 var distance_string_period = distance_string.indexOf('.');
-                distance_string = distance_string.substring(0, distance_string_period + 2) + " miles";
-                attachInstructionText(stepDisplay, marker, distance_string, map);
+                distance_string = distance_string.substring(0, distance_string_period + 4) + " miles";
             }
+            coord_previous = myRoute[i];
+            attachInstructionText(stepDisplay, marker, "test", map);
         }
     }
-    function attachInstructionText(stepDisplay, marker, text, map) {
-        google.maps.event.addListener(marker, 'click', function () {
-            // Open an info window when the marker is clicked on, containing the text
-            // of the step.
-            stepDisplay.setContent(text);
-            stepDisplay.open(map, marker);
-        });
-    }
+}
+function attachInstructionText(stepDisplay, marker, text, map) {
+    google.maps.event.addListener(marker, 'click', function () {
+        // Open an info window when the marker is clicked on, containing the text
+        // of the step.
+        stepDisplay.setContent(text);
+        stepDisplay.open(map, marker);
+    });
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -157,4 +178,23 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
         'Error: The Geolocation service failed.' :
         'Error: Your browser doesn\'t support geolocation.');
     infoWindow.open(map);
+}
+
+function calcCrow(lat1, lon1, lat2, lon2) {
+    var R = 6371; // km
+    var dLat = toRad(lat2 - lat1);
+    var dLon = toRad(lon2 - lon1);
+    var lat1 = toRad(lat1);
+    var lat2 = toRad(lat2);
+
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c;
+    return d;
+}
+
+// Converts numeric degrees to radians
+function toRad(Value) {
+    return Value * Math.PI / 180;
 }
