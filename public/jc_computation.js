@@ -12,8 +12,8 @@ var markerArray = [];
 var waypoint_direction = 1;
 var lat_long_array = [];
 var pos = {
-    lat: 0,
-    lng: 0
+    lat: 42.0284,
+    lng: -93.6509
 };
 var trice_pos = {
     lat: 42.0140,
