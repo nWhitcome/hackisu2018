@@ -2,27 +2,29 @@ var total_distance = 0.0;
 var input_target = 0.0;
 var map, infoWindow;
 var distance_string = "";
-var waypoints = [];
+var waypoint_array = [];
 var coord_previous;
+var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var labelIndex = 0;
+var current_route = 0;
+var number_of_responses = 0;
+var markerArray = [];
+var waypoint_direction = 1;
+var lat_long_array = [];
+var pos = {
+    lat: 0,
+    lng: 0
+};
+var trice_pos = {
+    lat: 42.0140,
+    lng: -93.6358
+}
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: 37.0902, lng: -95.7129 },
         zoom: 5
     });
     infoWindow = new google.maps.InfoWindow;
-    var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    var labelIndex = 0;
-    var current_route = 0;
-    var number_of_responses = 0;
-    var markerArray = [];
-    var pos = {
-        lat: 0,
-        lng: 0
-    };
-    var trice_pos = {
-        lat: 42.0140,
-        lng: -93.6358
-    }
     // Try HTML5 geolocation.
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -30,6 +32,7 @@ function initMap() {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
+            lat_long_array[0] = pos;
             var contentString = 'Current Location'
             var infowindow = new google.maps.InfoWindow({
                 content: contentString
@@ -50,62 +53,108 @@ function initMap() {
         // Browser doesn't support Geolocation
         handleLocationError(false, infoWindow, map.getCenter());
     }
-    stepDisplay = new google.maps.InfoWindow();
+    var on_map = new google.maps.Polyline({
+        path: [],
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+    });
+    var markerStart = new google.maps.Marker({
+        position: null,
+        label: 'A',
+        map: map
+    });
+    var markerEnd = new google.maps.Marker({
+        position: null,
+        label: 'B',
+        map: map
+    });
+    function drawLines(array_data) {
+        var line_coordinates = array_data;
+        console.log(line_coordinates)
+        on_map = new google.maps.Polyline({
+            path: line_coordinates,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        });
+        on_map.setMap(map);
+        if (document.getElementById('loop_radio').checked == true) {
+            temp_distance = parseFloat(distance_string.replace(/[^\d.-]/g, ''));
+            temp_distance = temp_distance * 2.0;
+            distance_string = temp_distance.toString().replace(/[^\d.-]/g, '');
+        }
+        document.getElementById('total_mile_counter').innerHTML = distance_string.replace(/[^\d.-]/g, '');
+        markerStart.setPosition(array_data[0]);
+        markerEnd.setPosition(array_data[array_data.length-1]);
+
+    }
     var directionsService = new google.maps.DirectionsService;
     var directionsDisplay = new google.maps.DirectionsRenderer;
+    var stepDisplay = new google.maps.InfoWindow();
     directionsDisplay.setMap(map);
 
-    var clearRouteNumber = function(){
-        var current_route = 0;
-        console.log(current_route);
+    var clearRouteNumber = function () {
+        directionsDisplay.setMap(null);
+        on_map.setMap(null);
+        on_map.path = [];
+        //lat_long_array = [];
+        current_route = 0;
+        //document.getElementById('cur_alt_text').innerHTML = "Current path: 0";
         onChangeHandler();
     }
     var onChangeHandler = function () { //When The run button is clicked
         if (document.getElementById('north_radio').checked == true) {
             trice_pos = {
-                lat: pos.lat + 1.0,
+                lat: pos.lat + .75,
                 lng: pos.lng
             }
+            waypoint_direction = 1;
         }
         else if (document.getElementById('south_radio').checked == true) {
             trice_pos = {
-                lat: pos.lat - 1.0,
+                lat: pos.lat - .75,
                 lng: pos.lng
             }
+            waypoint_direction = 3;
         }
         else if (document.getElementById('east_radio').checked == true) {
             trice_pos = {
                 lat: pos.lat,
-                lng: pos.lng + 1.0
+                lng: pos.lng + .75
             }
+            waypoint_direction = 2;
         }
         else if (document.getElementById('west_radio').checked == true) {
             trice_pos = {
                 lat: pos.lat,
-                lng: pos.lng - 1.0
+                lng: pos.lng - .75
             }
+            waypoint_direction = 4;
         }
-        calculateAndDisplayRoute(directionsService, directionsDisplay, false, pos, trice_pos);
         input_target = document.getElementById('mile_input_box').value;
         if (document.getElementById('loop_radio').checked == true) {
             input_target = input_target / 2.0;
         }
+        waypoint_array = waypointGen(5, input_target, waypoint_direction, pos, .75);
+        calculateAndDisplayRoute(directionsService, directionsDisplay, false, pos, trice_pos);
     };
 
-    var getAlternate = function () {
-        console.log("here");
-        if (current_route < number_of_responses - 1) {
-            current_route = current_route + 1;
-        }
-        else {
+    function getAlternate() {
+        if (current_route == (number_of_responses - 1)) {
             current_route = 0;
         }
-        document.getElementById('cur_alt_text').innerHTML = "Current path: " + current_route;
+        else {
+            current_route += 1;
+        }
+        document.getElementById('cur_alt_text').innerHTML = ("Current path: " + current_route);
         onChangeHandler();
     }
 
     document.getElementById('testbutton').addEventListener('click', clearRouteNumber);
-    document.getElementById('alternate_button').addEventListener('click', getAlternate);
+    //document.getElementById('alternate_button').addEventListener('click', getAlternate);
     function calculateAndDisplayRoute(directionsService, directionsDisplay, display_bool, start, finish) {
         total_distance = 0;
         directionsService.route({
@@ -114,17 +163,12 @@ function initMap() {
             travelMode: 'WALKING',
             avoidTolls: true,
             avoidHighways: true,
-            provideRouteAlternatives: true
+            //waypoints: waypoint_array,
+            optimizeWaypoints: true
         }, function (response, status) {
             if (status === 'OK') {
                 if (display_bool == true) {
                     directionsDisplay.setDirections(response);
-                    if (document.getElementById('loop_radio').checked == true) {
-                        temp_distance = parseFloat(distance_string.replace(/[^\d.-]/g, ''));
-                        temp_distance = temp_distance * 2.0;
-                        distance_string = temp_distance.toString().replace(/[^\d.-]/g, '');
-                    }
-                    document.getElementById('total_mile_counter').innerHTML = distance_string.replace(/[^\d.-]/g, '');
                 }
                 else {
                     showSteps(response, markerArray, stepDisplay, map);
@@ -138,20 +182,24 @@ function initMap() {
         // For each step, place a marker, and add the text to the marker's infowindow.
         // Also attach the marker to an array so we can keep track of it and remove it
         // when calculating new routes.
-        var myRoute = directionResult.routes[current_route].overview_path;
+        lat_long_array = [pos];
+        var myRoute = directionResult.routes[0].overview_path;
         number_of_responses = directionResult.routes.length;
-        document.getElementById('num_alt_text').innerHTML = "Number of alternates: " + (number_of_responses - 1);
-        console.log(directionResult.routes);
+        //document.getElementById('num_alt_text').innerHTML = "Number of alternates: " + (number_of_responses - 1);
         for (var i = 0; i < myRoute.length; i++) {
-            console.log(current_route);
             if ((parseFloat(total_distance) > parseFloat(input_target)) || (i == myRoute.length - 1)) {
-                calculateAndDisplayRoute(directionsService, directionsDisplay, true, pos, myRoute[i - 1]);
+                //calculateAndDisplayRoute(directionsService, directionsDisplay, true, pos, myRoute[i - 1]);
+                if (lat_long_array != null)
+                    drawLines(lat_long_array);
+                console.log(lat_long_array);
                 break;
             }
-            var marker = markerArray[i] || new google.maps.Marker;
+            var marker = markerArray[i] = markerArray[i] || new google.maps.Marker;
+            //console.log(markerArray)
             if (i > 0) {
                 var temp_coord_array_1 = myRoute[i].toString().replace(/[^\d\s.-]/g, '').split(" ");
                 var past_coord_array_1 = coord_previous.toString().replace(/[^\d\s.-]/g, '').split(" ");
+                lat_long_array[i] = myRoute[i];
                 var tempDist = calcCrow(temp_coord_array_1[0], temp_coord_array_1[1], past_coord_array_1[0], past_coord_array_1[1]);
                 total_distance = total_distance + tempDist;
                 distance_string = total_distance.toString();
@@ -198,3 +246,51 @@ function calcCrow(lat1, lon1, lat2, lon2) {
 function toRad(Value) {
     return Value * Math.PI / 180;
 }
+
+var previous_node;
+function waypointGen(craze, num_miles, direction, start_location, space) {
+    var return_array = [];
+    var k = 0;
+    var temp_start = new google.maps.LatLng(start_location.lat, start_location.lng);
+    var num_items = num_miles / craze;
+    while (k < num_items) {
+        if (k == 0) {
+            var previous_node = temp_start;
+        }
+        if (direction == 1) { //North
+            temp_start = new google.maps.LatLng(previous_node.lat + generateRandomNumber(false, space), previous_node.lng + generateRandomNumber(true, space));
+        }
+        if (direction == 2) { //East
+            temp_start = new google.maps.LatLng(previous_node.lat + generateRandomNumber(true, space), previous_node.lng + generateRandomNumber(false, space));
+        }
+        if (direction == 3) { //South
+            temp_start = new google.maps.LatLng(previous_node.lat - generateRandomNumber(false, space), previous_node.lng + generateRandomNumber(true, space))
+        }
+        if (direction == 4) { //West
+            temp_start = new google.maps.LatLng(previous_node.lat + generateRandomNumber(true, space), previous_node.lng - generateRandomNumber(false, space));
+        }
+
+        var temp_waypoint = {
+            location: temp_start,
+            stopover: false
+        }
+
+        previous_node = temp_waypoint;
+        return_array.push(temp_waypoint);
+        k = k + 1;
+    }
+    return return_array;
+}
+
+function generateRandomNumber(sign, space) {
+    var min = 0.00724637681,
+        max = 0.01449275362,
+        highlightedNumber = Math.random() * (max - min) + min;
+    highlightedNumber = highlightedNumber / 2;
+    if (sign) {
+        if (Math.floor(Math.random() * 2) == 0) {
+            highlightedNumber = highlightedNumber * (-1);
+        }
+    }
+    return highlightedNumber;
+};
