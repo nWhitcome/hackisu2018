@@ -138,7 +138,7 @@ function initMap() {
         if (document.getElementById('loop_radio').checked == true) {
             input_target = input_target / 2.0;
         }
-        waypoint_array = waypointGen(5, input_target, waypoint_direction, pos, .75);
+        waypoint_array = waypointGen(2, input_target, waypoint_direction, pos, 2);
         calculateAndDisplayRoute(directionsService, directionsDisplay, false, pos, trice_pos);
     };
 
@@ -163,7 +163,7 @@ function initMap() {
             travelMode: 'WALKING',
             avoidTolls: true,
             avoidHighways: true,
-            //waypoints: waypoint_array,
+            waypoints: waypoint_array,
             optimizeWaypoints: true
         }, function (response, status) {
             if (status === 'OK') {
@@ -247,46 +247,76 @@ function toRad(Value) {
     return Value * Math.PI / 180;
 }
 
-var previous_node;
 function waypointGen(craze, num_miles, direction, start_location, space) {
     var return_array = [];
     var k = 0;
-    var temp_start = new google.maps.LatLng(start_location.lat, start_location.lng);
-    var num_items = num_miles / craze;
+    var temp_start = {
+        lat: parseFloat(start_location.lat),
+        lng: parseFloat(start_location.lng)
+    }
+    var num_items = num_miles * craze;
+    var previous_node = {
+        location: temp_start,
+        stopover: false
+    }
     while (k < num_items) {
-        if (k == 0) {
-            var previous_node = temp_start;
-        }
         if (direction == 1) { //North
-            temp_start = new google.maps.LatLng(previous_node.lat + generateRandomNumber(false, space), previous_node.lng + generateRandomNumber(true, space));
+            temp_start = {
+                lat: previous_node.location.lat + generateRandomNumber(false, space), 
+                lng: previous_node.location.lng + generateRandomNumber(true, space)
+            };
+            console.log(previous_node.location.lat)
         }
         if (direction == 2) { //East
-            temp_start = new google.maps.LatLng(previous_node.lat + generateRandomNumber(true, space), previous_node.lng + generateRandomNumber(false, space));
+            temp_start = {
+                lat: previous_node.location.lat + generateRandomNumber(true, space), 
+                lng: previous_node.location.lng + generateRandomNumber(false, space)
+            };
         }
         if (direction == 3) { //South
-            temp_start = new google.maps.LatLng(previous_node.lat - generateRandomNumber(false, space), previous_node.lng + generateRandomNumber(true, space))
+            temp_start = {
+                lat: previous_node.location.lat - generateRandomNumber(false, space),
+                lng: previous_node.location.lng + generateRandomNumber(true, space)
+            }
         }
         if (direction == 4) { //West
-            temp_start = new google.maps.LatLng(previous_node.lat + generateRandomNumber(true, space), previous_node.lng - generateRandomNumber(false, space));
+            temp_start = {
+                lat: previous_node.location.lat + generateRandomNumber(true, space), 
+                lng: previous_node.location.lng - generateRandomNumber(false, space)};
         }
-
         var temp_waypoint = {
             location: temp_start,
             stopover: false
         }
-
-        previous_node = temp_waypoint;
         return_array.push(temp_waypoint);
         k = k + 1;
     }
+    //draw_waypoints(return_array);
     return return_array;
+}
+
+function draw_waypoints(array){
+    console.log(array)
+    var i = 0;
+    var locationpass = {
+        lat: array[i].location.lat,
+        lng: array[i].location.lng
+    }
+    console.log(locationpass)
+    while(i<array.length){
+        var newmarker = new google.maps.Marker({
+            position: locationpass,
+            map: map
+        });
+        ++i;
+    }
 }
 
 function generateRandomNumber(sign, space) {
     var min = 0.00724637681,
         max = 0.01449275362,
         highlightedNumber = Math.random() * (max - min) + min;
-    highlightedNumber = highlightedNumber / 2;
+    highlightedNumber = highlightedNumber * space;
     if (sign) {
         if (Math.floor(Math.random() * 2) == 0) {
             highlightedNumber = highlightedNumber * (-1);
