@@ -254,7 +254,7 @@ function waypointGen(craze, num_miles, direction, start_location, space) {
         lat: parseFloat(start_location.lat),
         lng: parseFloat(start_location.lng)
     }
-    var num_items = num_miles * craze;
+    var num_items = (num_miles * craze)/2.0;
     var previous_node = {
         location: temp_start,
         stopover: false
@@ -263,25 +263,25 @@ function waypointGen(craze, num_miles, direction, start_location, space) {
         if (direction == 1) { //North
             temp_start = {
                 lat: previous_node.location.lat + generateRandomNumber(false, space), 
-                lng: previous_node.location.lng + generateRandomNumber(true, space)
+                lng: previous_node.location.lng + generateRandomNumber(true, space)/2.0
             };
             console.log(previous_node.location.lat)
         }
         if (direction == 2) { //East
             temp_start = {
-                lat: previous_node.location.lat + generateRandomNumber(true, space), 
+                lat: previous_node.location.lat + generateRandomNumber(true, space)/2.0, 
                 lng: previous_node.location.lng + generateRandomNumber(false, space)
             };
         }
         if (direction == 3) { //South
             temp_start = {
                 lat: previous_node.location.lat - generateRandomNumber(false, space),
-                lng: previous_node.location.lng + generateRandomNumber(true, space)
+                lng: previous_node.location.lng + generateRandomNumber(true, space)/2.0
             }
         }
         if (direction == 4) { //West
             temp_start = {
-                lat: previous_node.location.lat + generateRandomNumber(true, space), 
+                lat: previous_node.location.lat + generateRandomNumber(true, space)/2.0, 
                 lng: previous_node.location.lng - generateRandomNumber(false, space)};
         }
         var temp_waypoint = {
@@ -303,7 +303,12 @@ function draw_waypoints(array){
         lng: array[i].location.lng
     }
     console.log(locationpass)
+    console.log(array.length)
     while(i<array.length){
+         locationpass = {
+            lat: array[i].location.lat,
+            lng: array[i].location.lng
+        }
         var newmarker = new google.maps.Marker({
             position: locationpass,
             map: map
@@ -314,9 +319,9 @@ function draw_waypoints(array){
 
 function generateRandomNumber(sign, space) {
     var min = 0.00724637681,
-        max = 0.01449275362,
+        max = 0.01449275362 * space,
         highlightedNumber = Math.random() * (max - min) + min;
-    highlightedNumber = highlightedNumber * space;
+    //highlightedNumber = highlightedNumber * space;
     if (sign) {
         if (Math.floor(Math.random() * 2) == 0) {
             highlightedNumber = highlightedNumber * (-1);
