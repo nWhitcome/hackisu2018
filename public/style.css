@@ -80,6 +80,22 @@ button:hover{
     color: darkslategray;
 }
 
+#locality_input_box{
+    width: 266px;
+    border: 2px solid #A8383B;
+    padding: 5px 4px;
+    font-size: 18px;
+    color: darkslategray;
+}
+
+#craze_input_box{
+    width: 266px;
+    border: 2px solid #A8383B;
+    padding: 5px 4px;
+    font-size: 18px;
+    color: darkslategray;
+}
+
 #side_bottom_info_box{
     position: relative;
     color: darkslategray;

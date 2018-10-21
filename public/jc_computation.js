@@ -138,7 +138,7 @@ function initMap() {
         if (document.getElementById('loop_radio').checked == true) {
             input_target = input_target / 2.0;
         }
-        waypoint_array = waypointGen(2, input_target, waypoint_direction, pos, 2);
+        waypoint_array = waypointGen(document.getElementById('craze_input_box').value, input_target, waypoint_direction, pos, document.getElementById('locality_input_box').value);
         calculateAndDisplayRoute(directionsService, directionsDisplay, false, pos, trice_pos);
     };
 

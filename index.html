@@ -27,7 +27,9 @@
             </div>
             <div class="run_type_wrapper">
                 <p style="margin: 2px;">Mileage: </p>
-                <input type="number" name="miles" id="mile_input_box" step=".01" value="1.0">
+                <form>
+                    <input type="number" name="miles" id="mile_input_box" step=".01" value="1.0">
+                </form>
             </div>
             <div class="run_type_wrapper">
                 <p style="margin: 2px;">Starting Location:</p>
@@ -44,6 +46,18 @@
                     <input type="radio" name="runType" id="west_radio"> West<br>
                 </form>
             </div>
+            <div class="run_type_wrapper">
+                <p style="margin: 2px;">Locality: </p>
+                <form>
+                    <input type="number" name="local" id="locality_input_box" step=".01" value="1.0">
+                </form>
+            </div>
+            <div class="run_type_wrapper">
+                <p style="margin: 2px;">Craziness (Beta): </p>
+                <form>
+                    <input type="number" name="local" id="craze_input_box" step=".01" value="1.0">
+                </form>
+            </div>
             <div class="button_wrapper">
                 <button id="testbutton">Run</button>
             </div>
@@ -57,6 +71,7 @@
                 <p id="num_alt_text" style="font-size: 18px;">Number of alternates: 0</p>
                 <p id="cur_alt_text" style="font-size: 18px;">Current path: 0</p>
             </div> -->
+            
         </div>
     </div>
     <div id="map"></div>
