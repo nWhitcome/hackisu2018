@@ -99,8 +99,7 @@ function initMap() {
     var clearRouteNumber = function () {
         directionsDisplay.setMap(null);
         on_map.setMap(null);
-        on_map.path = [];
-        //lat_long_array = [];
+
         current_route = 0;
         //document.getElementById('cur_alt_text').innerHTML = "Current path: 0";
         onChangeHandler();
@@ -142,16 +141,16 @@ function initMap() {
         calculateAndDisplayRoute(directionsService, directionsDisplay, false, pos, trice_pos);
     };
 
-    function getAlternate() {
-        if (current_route == (number_of_responses - 1)) {
-            current_route = 0;
-        }
-        else {
-            current_route += 1;
-        }
-        document.getElementById('cur_alt_text').innerHTML = ("Current path: " + current_route);
-        onChangeHandler();
-    }
+    // function getAlternate() {
+    //     if (current_route == (number_of_responses - 1)) {
+    //         current_route = 0;
+    //     }
+    //     else {
+    //         current_route += 1;
+    //     }
+    //     document.getElementById('cur_alt_text').innerHTML = ("Current path: " + current_route);
+    //     onChangeHandler();
+    // }
 
     document.getElementById('testbutton').addEventListener('click', clearRouteNumber);
     //document.getElementById('alternate_button').addEventListener('click', getAlternate);
@@ -179,23 +178,17 @@ function initMap() {
         });
     }
     function showSteps(directionResult, markerArray, stepDisplay, map) {
-        // For each step, place a marker, and add the text to the marker's infowindow.
-        // Also attach the marker to an array so we can keep track of it and remove it
-        // when calculating new routes.
         lat_long_array = [pos];
         var myRoute = directionResult.routes[0].overview_path;
         number_of_responses = directionResult.routes.length;
         //document.getElementById('num_alt_text').innerHTML = "Number of alternates: " + (number_of_responses - 1);
         for (var i = 0; i < myRoute.length; i++) {
             if ((parseFloat(total_distance) > parseFloat(input_target)) || (i == myRoute.length - 1)) {
-                //calculateAndDisplayRoute(directionsService, directionsDisplay, true, pos, myRoute[i - 1]);
                 if (lat_long_array != null)
                     drawLines(lat_long_array);
-                console.log(lat_long_array);
                 break;
             }
             var marker = markerArray[i] = markerArray[i] || new google.maps.Marker;
-            //console.log(markerArray)
             if (i > 0) {
                 var temp_coord_array_1 = myRoute[i].toString().replace(/[^\d\s.-]/g, '').split(" ");
                 var past_coord_array_1 = coord_previous.toString().replace(/[^\d\s.-]/g, '').split(" ");
@@ -228,6 +221,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.open(map);
 }
 
+//Calculates the distance between two points using longitude/latitude
 function calcCrow(lat1, lon1, lat2, lon2) {
     var R = 6371; // km
     var dLat = toRad(lat2 - lat1);
@@ -254,7 +248,11 @@ function waypointGen(craze, num_miles, direction, start_location, space) {
         lat: parseFloat(start_location.lat),
         lng: parseFloat(start_location.lng)
     }
-    var num_items = (num_miles * craze)/2.0;
+    var num_items = num_miles * craze;
+    if(num_items > 23){
+        num_items = 23;
+    }
+    console.log(num_items)
     var previous_node = {
         location: temp_start,
         stopover: false
@@ -265,7 +263,6 @@ function waypointGen(craze, num_miles, direction, start_location, space) {
                 lat: previous_node.location.lat + generateRandomNumber(false, space), 
                 lng: previous_node.location.lng + generateRandomNumber(true, space)/2.0
             };
-            console.log(previous_node.location.lat)
         }
         if (direction == 2) { //East
             temp_start = {
@@ -296,14 +293,11 @@ function waypointGen(craze, num_miles, direction, start_location, space) {
 }
 
 function draw_waypoints(array){
-    console.log(array)
     var i = 0;
     var locationpass = {
         lat: array[i].location.lat,
         lng: array[i].location.lng
     }
-    console.log(locationpass)
-    console.log(array.length)
     while(i<array.length){
          locationpass = {
             lat: array[i].location.lat,
