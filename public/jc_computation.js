@@ -223,7 +223,7 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 
 //Calculates the distance between two points using longitude/latitude
 function calcCrow(lat1, lon1, lat2, lon2) {
-    var R = 6371; // km
+    var R = 3959;
     var dLat = toRad(lat2 - lat1);
     var dLon = toRad(lon2 - lon1);
     var lat1 = toRad(lat1);
