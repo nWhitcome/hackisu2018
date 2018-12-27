@@ -80,6 +80,7 @@ button:hover{
     padding: 5px 4px;
     font-size: 18px;
     box-sizing : border-box;
+    color: darkslategray;
 }
 
 #side_bottom_info_box{
