@@ -1,9 +1,5 @@
 #map {
-    position: absolute;
-    left: 300px;
-    right: 0;
-    top: 50px;
-    bottom: 0;
+    flex: 1;
 }
 
 /* Optional: Makes the sample page fill the window. */
@@ -11,15 +7,22 @@ html,
 body {
     height: 100%;
     margin: 0;
-    padding: 0;
     font-family: 'Open Sans', sans-serif;
     overflow: hidden;
 }
 
-::-webkit-scrollbar {
-    width: 0px;  /* remove scrollbar space */
-    background: transparent;  /* optional: just make scrollbar invisible */
+.flex_column {
+    display: flex;
+    flex-flow: column;
 }
+
+.flex_row {
+    display: flex;
+    flex: 1;
+    flex-flow: row nowrap;
+    background-color: whitesmoke;
+}
+
 /* optional: show position indicator in red */
 ::-webkit-scrollbar-thumb {
     background: #FF0000;
@@ -33,19 +36,17 @@ body {
     line-height: 50px;
     text-align: center;
     font-size: 30px;
+    flex: 0 auto;
 }
 
 #side_bar {
+    flex: 0 278px;
     overflow-y: auto;
-    overflow-x: hidden;
     padding: 5px 10px;
-    width: 278px;
-    background-color: whitesmoke;
-    position: absolute;
-    left: 0;
-    top: 50px;
-    bottom: 0;
-    border-right: 2px solid #dedede;
+    background-color: inherit;
+    border-width: 0 2px 0 0;
+    border-style: solid;
+    border-color: #dedede;
     color: darkslategray;
     font-size: 20px;
 }
@@ -54,6 +55,7 @@ body {
     margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: #dedede solid 4px;
+    width: 100%;
 }
 
 button{
@@ -72,27 +74,12 @@ button:hover{
     background-color:#993336;
 }
 
-#mile_input_box{
-    width: 266px;
+.input_box {
+    width: 100%;
     border: 2px solid #A8383B;
     padding: 5px 4px;
     font-size: 18px;
-    color: darkslategray;
-}
-
-#locality_input_box{
-    width: 266px;
-    border: 2px solid #A8383B;
-    padding: 5px 4px;
-    font-size: 18px;
-    color: darkslategray;
-}
-
-#craze_input_box{
-    width: 266px;
-    border: 2px solid #A8383B;
-    padding: 5px 4px;
-    font-size: 18px;
+    box-sizing : border-box;
     color: darkslategray;
 }
 
@@ -121,4 +108,15 @@ h3{
 
 p{
     color: #1d3232;
+}
+
+@media all and (max-width: 700px) and (orientation: portrait) {
+    .flex_row {
+        flex-flow: column-reverse wrap;
+    }
+
+    #side_bar {
+        border-width: 2px 0 0 0;
+        flex: 0 60%;
+    }
 }
