@@ -1,25 +1,27 @@
 #map {
-    position: absolute;
-    left: 300px;
-    right: 0;
-    top: 50px;
-    bottom: 0;
+    flex: 1;
 }
 
 /* Optional: Makes the sample page fill the window. */
-html,
-body {
+html, body {
     height: 100%;
     margin: 0;
-    padding: 0;
     font-family: 'Open Sans', sans-serif;
     overflow: hidden;
 }
 
-::-webkit-scrollbar {
-    width: 0px;  /* remove scrollbar space */
-    background: transparent;  /* optional: just make scrollbar invisible */
+body {
+    display: flex;
+    flex-flow: column;
 }
+
+#uicontainer {
+    display: flex;
+    flex: 1;
+    flex-flow: row wrap;
+    background: #F5F5F5;
+}
+
 /* optional: show position indicator in red */
 ::-webkit-scrollbar-thumb {
     background: #FF0000;
@@ -33,20 +35,14 @@ body {
     line-height: 50px;
     text-align: center;
     font-size: 30px;
+    flex: 0 0 auto;
 }
 
 #side_bar {
-    overflow-y: auto;
-    overflow-x: hidden;
+    background: inherit;
     padding: 5px 10px;
-    width: 278px;
-    background-color: whitesmoke;
-    position: absolute;
-    left: 0;
-    top: 50px;
-    bottom: 0;
-    border-right: 2px solid #dedede;
-    color: darkslategray;
+    flex: 0 0 278px;
+    overflow: auto;
     font-size: 20px;
 }
 
@@ -73,7 +69,7 @@ button:hover{
 }
 
 #mile_input_box{
-    width: 266px;
+    width: 250px;
     border: 2px solid #A8383B;
     padding: 5px 4px;
     font-size: 18px;
@@ -81,7 +77,7 @@ button:hover{
 }
 
 #locality_input_box{
-    width: 266px;
+    width: 250px;
     border: 2px solid #A8383B;
     padding: 5px 4px;
     font-size: 18px;
@@ -89,7 +85,7 @@ button:hover{
 }
 
 #craze_input_box{
-    width: 266px;
+    width: 250px;
     border: 2px solid #A8383B;
     padding: 5px 4px;
     font-size: 18px;
@@ -121,4 +117,8 @@ h3{
 
 p{
     color: #1d3232;
+}
+
+@media screen and (max-width: 760px) {
+    
 }

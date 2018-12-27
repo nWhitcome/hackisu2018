@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head land="en">
     <title>PathFinder</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
@@ -13,11 +12,10 @@
 
     </style> -->
 </head>
-
 <body>
     <div id="top_bar">PathFinder</div>
-    <div id="side_bar">
-        <div id="left_settings_box">
+    <div id="uicontainer">
+        <div id="side_bar">
             <div class="run_type_wrapper">
                 <p style="margin: 2px;">Run Type:</p>
                 <form>
@@ -66,18 +64,16 @@
                 <h1 id="total_mile_counter">0.0</h1>
                 <h2 id="miles_text">miles</h2>
             </div>
+    
             <!-- <div class="run_type_wrapper">
                 <button id="alternate_button">Alternate</button>
                 <p id="num_alt_text" style="font-size: 18px;">Number of alternates: 0</p>
                 <p id="cur_alt_text" style="font-size: 18px;">Current path: 0</p>
             </div> -->
-            
-        </div>
+        </div>    
+        <div id="map"></div>
+        <script type="text/javascript" src="jc_computation.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQh0NqbDgZaAfxz4CE2cYTTwxa5vle9N4&callback=initMap"></script>
     </div>
-    <div id="map"></div>
-    <script type="text/javascript" src="jc_computation.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQh0NqbDgZaAfxz4CE2cYTTwxa5vle9N4&callback=initMap">
-    </script>
 </body>
-
 </html>
