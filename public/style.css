@@ -41,7 +41,7 @@ body {
 #side_bar {
     background: inherit;
     padding: 5px 10px;
-    flex: 0 0 278px;
+    flex: 0 278px;
     overflow: auto;
     font-size: 20px;
 }
@@ -119,6 +119,13 @@ p{
     color: #1d3232;
 }
 
-@media screen and (max-width: 760px) {
-    
+@media (max-width: 700px) and (orientation:portrait) {
+    #uicontainer {
+        flex-flow: column-reverse wrap;
+    }
+
+    #side_bar {
+        border-top: 1px solid #666;
+        flex: 0 60%;
+    }
 }
