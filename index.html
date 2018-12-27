@@ -12,9 +12,9 @@
 
     </style> -->
 </head>
-<body>
+<body class="flex_column">
     <div id="top_bar">PathFinder</div>
-    <div id="uicontainer">
+    <div class="flex_row">
         <div id="side_bar">
             <div class="run_type_wrapper">
                 <p style="margin: 2px;">Run Type:</p>
@@ -26,7 +26,7 @@
             <div class="run_type_wrapper">
                 <p style="margin: 2px;">Mileage: </p>
                 <form>
-                    <input type="number" name="miles" id="mile_input_box" step=".01" value="1.0">
+                    <input type="number" name="miles" class="input_box" id="mile_input_box" step=".01" value="1.0">
                 </form>
             </div>
             <div class="run_type_wrapper">
@@ -47,24 +47,21 @@
             <div class="run_type_wrapper">
                 <p style="margin: 2px;">Locality: </p>
                 <form>
-                    <input type="number" name="local" id="locality_input_box" step=".01" value="1.0">
+                    <input type="number" name="local" class="input_box" id="locality_input_box" step=".01" value="1.0">
                 </form>
             </div>
             <div class="run_type_wrapper">
                 <p style="margin: 2px;">Craziness (Beta): </p>
                 <form>
-                    <input type="number" name="local" id="craze_input_box" step=".01" value="1.0">
+                    <input type="number" name="local" class="input_box" id="craze_input_box" step=".01" value="1.0">
                 </form>
             </div>
-            <div class="button_wrapper">
-                <button id="testbutton">Run</button>
-            </div>
+            <button id="testbutton">Run</button>
             <div id="side_bottom_info_box">
                 <h3>Total:</h3>
                 <h1 id="total_mile_counter">0.0</h1>
                 <h2 id="miles_text">miles</h2>
             </div>
-    
             <!-- <div class="run_type_wrapper">
                 <button id="alternate_button">Alternate</button>
                 <p id="num_alt_text" style="font-size: 18px;">Number of alternates: 0</p>

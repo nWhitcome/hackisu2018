@@ -3,23 +3,24 @@
 }
 
 /* Optional: Makes the sample page fill the window. */
-html, body {
+html,
+body {
     height: 100%;
     margin: 0;
     font-family: 'Open Sans', sans-serif;
     overflow: hidden;
 }
 
-body {
+.flex_column {
     display: flex;
     flex-flow: column;
 }
 
-#uicontainer {
+.flex_row {
     display: flex;
     flex: 1;
-    flex-flow: row wrap;
-    background: #F5F5F5;
+    flex-flow: row nowrap;
+    background-color: whitesmoke;
 }
 
 /* optional: show position indicator in red */
@@ -35,14 +36,18 @@ body {
     line-height: 50px;
     text-align: center;
     font-size: 30px;
-    flex: 0 0 auto;
+    flex: 0 auto;
 }
 
 #side_bar {
-    background: inherit;
-    padding: 5px 10px;
     flex: 0 278px;
-    overflow: auto;
+    overflow-y: auto;
+    padding: 5px 10px;
+    background-color: inherit;
+    border-width: 0 2px 0 0;
+    border-style: solid;
+    border-color: #dedede;
+    color: darkslategray;
     font-size: 20px;
 }
 
@@ -50,6 +55,7 @@ body {
     margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: #dedede solid 4px;
+    width: 100%;
 }
 
 button{
@@ -68,28 +74,12 @@ button:hover{
     background-color:#993336;
 }
 
-#mile_input_box{
-    width: 250px;
+.input_box {
+    width: 100%;
     border: 2px solid #A8383B;
     padding: 5px 4px;
     font-size: 18px;
-    color: darkslategray;
-}
-
-#locality_input_box{
-    width: 250px;
-    border: 2px solid #A8383B;
-    padding: 5px 4px;
-    font-size: 18px;
-    color: darkslategray;
-}
-
-#craze_input_box{
-    width: 250px;
-    border: 2px solid #A8383B;
-    padding: 5px 4px;
-    font-size: 18px;
-    color: darkslategray;
+    box-sizing : border-box;
 }
 
 #side_bottom_info_box{
@@ -119,13 +109,13 @@ p{
     color: #1d3232;
 }
 
-@media (max-width: 700px) and (orientation:portrait) {
-    #uicontainer {
+@media all and (max-width: 700px) and (orientation: portrait) {
+    .flex_row {
         flex-flow: column-reverse wrap;
     }
 
     #side_bar {
-        border-top: 1px solid #666;
+        border-width: 2px 0 0 0;
         flex: 0 60%;
     }
 }
